@@ -249,7 +249,7 @@ export default function App() {
         </TouchableOpacity>
 
         
-        <TouchableOpacity onPress={() => Linking.openURL("https://www.instagram.com/basi__gar")} style={{justifyContent: "center", display: "flex", alignItems: "center", flexDirection: "row"}}>
+        <TouchableOpacity onPress={() => Linking.openURL("https://github.com/mathew2103/wifix")} style={{justifyContent: "center", display: "flex", alignItems: "center", flexDirection: "row"}}>
           <Text style={styles.footerText}>Version {require("./app.json").expo.runtimeVersion}</Text>
           <AntDesign color="white" size={20} name='github' style={{alignContent: "center", alignSelf: "center", paddingLeft:5}}/>
             </TouchableOpacity>
