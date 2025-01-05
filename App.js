@@ -4,7 +4,7 @@ import { addEventListener } from "@react-native-community/netinfo";
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import { MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
-import AsyncStorage, { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 const BACKGROUND_FETCH_TASK = 'background-fetch';
 
@@ -18,10 +18,6 @@ async function registerBackgroundFetchAsync() {
 async function unregisterBackgroundFetchAsync() {
   return BackgroundFetch.unregisterTaskAsync(BACKGROUND_FETCH_TASK);
 }
-
-
-
-
 
 export default function App() {
   const [user, setUserValue] = useState(null);
