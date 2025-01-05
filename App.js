@@ -4,7 +4,7 @@ import { addEventListener } from "@react-native-community/netinfo";
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import { MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import AsyncStorage, { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 const BACKGROUND_FETCH_TASK = 'background-fetch';
 
@@ -27,9 +27,9 @@ export default function App() {
   const [user, setUserValue] = useState(null);
   const [pass, setPassValue] = useState(null);
   const [toggle, setToggleValue] = useState(false);
-  const { getUser, setUser } = useAsyncStorage("username");
-  const { getPass, setPass } = useAsyncStorage("password");
-  const { getToggle, setToggle } = useAsyncStorage("toggle");
+  const { getItem: getUser, setItem: setUser } = useAsyncStorage("username");
+  const { getItem: getPass, setItem: setPass } = useAsyncStorage("password");
+  const { getItem: getToggle, setItem: setToggle } = useAsyncStorage("toggle");
   const [lastLogin, setLastLogin] = useState(0);
 
   const [showPass, setShowPass] = useState(false);
@@ -129,9 +129,9 @@ export default function App() {
     } 
     return true;
   }
-
+  // const v = "ac" 
   const readAll = async () => {
-    setUserValue(await getUser() ?? "");
+    setUserValue((await getUser()) ?? "");
     setPassValue(await getPass() ?? "");
     setToggleValue(await getToggle() ?? false);
   }
@@ -160,18 +160,13 @@ export default function App() {
 
 
   const submitted = async () => {
-    // verifyInfo(user, pass).then(console.log)
-    if(await verifyInfo()){
+  
+    if(await verifyInfo() || true){
       writeInfo();
       forceLogout();
-      forceLogin(false, user, pass);  
+      forceLogin(false);  
     }
   }
-  // }
-  // const sub = () => {
-  //   console.log(user,pass)
-  //   submitted()
-  // }
   
   
   useEffect(() => {
@@ -326,6 +321,7 @@ const styles = StyleSheet.create({
     shadowColor: "#2e8bc0",
     elevation: 10,
     borderWidth: 0.9,
+
     borderColor: "#2e8bc0", fontSize: 16
   }
 });
