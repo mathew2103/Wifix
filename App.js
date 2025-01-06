@@ -141,7 +141,7 @@ export default function App() {
 
   const writeToggle = async () => {    
     setToggleValue(!toggle);
-    await setToggle(!toggle);
+    await setToggle(toggle);
   }
 
   const tapToggle = () => {
