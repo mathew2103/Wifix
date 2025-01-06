@@ -2,7 +2,7 @@
   "expo": {
     "name": "wifix",
     "slug": "auto-wifi",
-    "version": "1.0.1",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon2.png",
     "newArchEnabled": true,
@@ -17,10 +17,7 @@
       "bundleIdentifier": "com.mathew2103.wifix"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/icon2.png",
-        "backgroundColor": "#010001"
-      },
+      
       "package": "com.mathew2103.wifix",
       "softwareKeyboardLayoutMode": "pan"
     },
