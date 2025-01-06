@@ -22,7 +22,7 @@ async function unregisterBackgroundFetchAsync() {
 export default function App() {
   const [user, setUserValue] = useState(null);
   const [pass, setPassValue] = useState(null);
-  const [toggle, setToggleValue] = useState(false);
+  const [toggle, setToggleValue] = useState(true);
   const { getItem: getUser, setItem: setUser } = useAsyncStorage("username");
   const { getItem: getPass, setItem: setPass } = useAsyncStorage("password");
   const { getItem: getToggle, setItem: setToggle } = useAsyncStorage("toggle");
@@ -182,12 +182,12 @@ export default function App() {
     });
     if(toggle){
       listener = addEventListener(state => {
-      if(state.type == "wifi" && ((lastLogin + 1.5 * 60 * 60 * 1000) <= Date.now())){
-        forceLogin(true);
-      } else { 
-        console.log(`last logged in ${(Date.now() - lastLogin)/1000}`) 
-      }
-    })
+        if(state.type == "wifi" && ((lastLogin + 1.5 * 60 * 60 * 1000) <= Date.now())){
+          forceLogin(true);
+        } else { 
+          console.log(`last logged in ${(Date.now() - lastLogin)/1000}`) 
+        }
+      })  
     }
     
     
