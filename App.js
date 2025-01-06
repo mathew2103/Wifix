@@ -27,6 +27,7 @@ export default function App() {
   const { getItem: getPass, setItem: setPass } = useAsyncStorage("password");
   const { getItem: getToggle, setItem: setToggle } = useAsyncStorage("toggle");
   const [lastLogin, setLastLogin] = useState(0);
+  let listener = undefined;
 
   const [showPass, setShowPass] = useState(false);
   const toggleShowPassword = () => {
@@ -127,7 +128,7 @@ export default function App() {
   }
   // const v = "ac" 
   const readAll = async () => {
-    setUserValue((await getUser()) ?? "");
+    setUserValue(await getUser() ?? "");
     setPassValue(await getPass() ?? "");
     setToggleValue(await getToggle() ?? false);
   }
@@ -147,8 +148,16 @@ export default function App() {
     // setToggleValue(!toggle)
     if(!toggle) {
       registerBackgroundFetchAsync();
+      listener = addEventListener(state => {
+        if(state.type == "wifi" && ((lastLogin + 1.5 * 60 * 60 * 1000) <= Date.now())){
+          forceLogin(true);
+        } else { 
+          console.log(`last logged in ${(Date.now() - lastLogin)/1000}`) 
+        }
+      })
     } else {
       unregisterBackgroundFetchAsync();
+      listener();
     }
     writeToggle();
 
@@ -171,14 +180,17 @@ export default function App() {
       forceLogin(true);
       return BackgroundFetch.BackgroundFetchResult.NewData;
     });
-
-    addEventListener(state => {
+    if(toggle){
+      listener = addEventListener(state => {
       if(state.type == "wifi" && ((lastLogin + 1.5 * 60 * 60 * 1000) <= Date.now())){
         forceLogin(true);
       } else { 
         console.log(`last logged in ${(Date.now() - lastLogin)/1000}`) 
       }
     })
+    }
+    
+    
   }, []) 
   
   
@@ -241,7 +253,7 @@ export default function App() {
 
         
         <TouchableOpacity onPress={() => Linking.openURL("https://github.com/mathew2103/wifix")} style={{justifyContent: "center", display: "flex", alignItems: "center", flexDirection: "row"}}>
-          <Text style={styles.footerText}>Version {require("./app.json").expo.runtimeVersion}</Text>
+          <Text style={styles.footerText}>Version {require("./app.json").expo.version}</Text>
           <AntDesign color="white" size={20} name='github' style={{alignContent: "center", alignSelf: "center", paddingLeft:5}}/>
             </TouchableOpacity>
         
