@@ -241,7 +241,7 @@ export default function App() {
 
       <View style={styles.footer}>
         <TouchableOpacity onPress={() => Linking.openURL("https://www.instagram.com/mathew._21")}>
-          <Text style={styles.footerText}>Developed by Mathew George</Text>
+          <Text style={styles.footerText}>Developed by Mathew Manachery</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => Linking.openURL("https://www.instagram.com/basi__gar")}>
           <Text style={styles.footerText}>Logo by Muhammed Basil</Text>
