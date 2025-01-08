@@ -37,3 +37,5 @@ yarn-error.*
 google-services.json
 # archived
 archived
+/android
+/ios

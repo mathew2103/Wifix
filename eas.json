@@ -24,6 +24,14 @@
         "buildType": "apk"
       },
       "distribution": "internal"
+    },
+    "newprod": {
+      "autoIncrement": false,
+      "channel": "new-production",
+      "android": {
+        "buildType": "apk"
+      },
+      "distribution": "internal"
     }
   },
   "submit": {

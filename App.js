@@ -27,7 +27,7 @@ export default function App() {
   const { getItem: getPass, setItem: setPass } = useAsyncStorage("password");
   const { getItem: getToggle, setItem: setToggle } = useAsyncStorage("toggle");
   const [lastLogin, setLastLogin] = useState(0);
-  let listener = undefined;
+  const [listener, setListener] = useState(undefined);
 
   const [showPass, setShowPass] = useState(false);
   const toggleShowPassword = () => {
@@ -51,6 +51,7 @@ export default function App() {
   }
 
   const forceLogin = async (bg = false) => {
+    // return
     try{
       const fetched = await fetch("http://172.16.222.1:1000/login?0330598d1f22608a", {
         "headers": {
@@ -130,7 +131,7 @@ export default function App() {
   const readAll = async () => {
     setUserValue(await getUser() ?? "");
     setPassValue(await getPass() ?? "");
-    setToggleValue(await getToggle() ?? false);
+    setToggleValue((await getToggle()) == "true" ? true : false);
   }
   
 
@@ -141,23 +142,23 @@ export default function App() {
 
   const writeToggle = async () => {    
     setToggleValue(!toggle);
-    await setToggle(toggle);
+    await setToggle(!toggle ? "true" : "false");
   }
 
   const tapToggle = () => {
     // setToggleValue(!toggle)
     if(!toggle) {
       registerBackgroundFetchAsync();
-      listener = addEventListener(state => {
+      setListener(addEventListener(state => {
         if(state.type == "wifi" && ((lastLogin + 1.5 * 60 * 60 * 1000) <= Date.now())){
           forceLogin(true);
         } else { 
           console.log(`last logged in ${(Date.now() - lastLogin)/1000}`) 
         }
-      })
+      }))
     } else {
       unregisterBackgroundFetchAsync();
-      listener();
+      if(listener !== undefined) listener();
     }
     writeToggle();
 
@@ -181,13 +182,13 @@ export default function App() {
       return BackgroundFetch.BackgroundFetchResult.NewData;
     });
     if(toggle){
-      listener = addEventListener(state => {
+      setListener(addEventListener(state => {
         if(state.type == "wifi" && ((lastLogin + 1.5 * 60 * 60 * 1000) <= Date.now())){
           forceLogin(true);
         } else { 
           console.log(`last logged in ${(Date.now() - lastLogin)/1000}`) 
         }
-      })  
+      }))  
     }
     
     

@@ -17,7 +17,7 @@
       "bundleIdentifier": "com.mathew2103.wifix"
     },
     "android": {
-      
+      "versionCode": 4,
       "package": "com.mathew2103.wifix",
       "softwareKeyboardLayoutMode": "pan"
     },
@@ -43,7 +43,7 @@
         }
       ]
     ],
-    "runtimeVersion": "1.0.1",
+    "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/fc1ce9d5-3c61-4f9e-a677-e5b3da67388c"
     }
