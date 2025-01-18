@@ -10,7 +10,7 @@ const BACKGROUND_FETCH_TASK = 'background-fetch';
 
 async function registerBackgroundFetchAsync() {
   return BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
-    minimumInterval: 60 * 60, // 1 hour
+    minimumInterval: 61 * 60,
     stopOnTerminate: false, // android only,
     startOnBoot: true, // android only
   });
@@ -19,6 +19,17 @@ async function unregisterBackgroundFetchAsync() {
   return BackgroundFetch.unregisterTaskAsync(BACKGROUND_FETCH_TASK);
 }
 
+const logToStorage = async (message) => {
+  const { getItem, setItem } = useAsyncStorage('logs');
+  let logs = JSON.parse(await getItem()) || [];
+  const timestamp = new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  
+  logs.unshift({ timestamp, message: `${timestamp}: ${message}` });
+  
+  if(logs.length > 10) logs = logs.slice(0, 10);
+  await setItem(JSON.stringify(logs));
+};
+
 export default function App() {
   const [user, setUserValue] = useState(null);
   const [pass, setPassValue] = useState(null);
@@ -26,7 +37,8 @@ export default function App() {
   const { getItem: getUser, setItem: setUser } = useAsyncStorage("username");
   const { getItem: getPass, setItem: setPass } = useAsyncStorage("password");
   const { getItem: getToggle, setItem: setToggle } = useAsyncStorage("toggle");
-  const [lastLogin, setLastLogin] = useState(0);
+  const {getItem: getLast, setItem: setLast} = useAsyncStorage('last');
+  const [lastLogin, setLastLogin] = useState(new Date(0));
   const [listener, setListener] = useState(undefined);
 
   const [showPass, setShowPass] = useState(false);
@@ -46,13 +58,15 @@ export default function App() {
       },
       "body": null,
       "method": "GET"
-    }).catch(() => {})
+    }).catch(() => {});
+    return;
     // console.log(logoutFetched);
   }
 
   const forceLogin = async (bg = false) => {
-    // return
+    console.log("logging in")
     try{
+      logToStorage("GETTING magic")
       const fetched = await fetch("http://172.16.222.1:1000/login?0330598d1f22608a", {
         "headers": {
           "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
@@ -64,15 +78,18 @@ export default function App() {
         "referrerPolicy": "strict-origin-when-cross-origin",
         "body": null,
         "method": "GET"
-      }).catch(() => {});
+      }).catch(() => {
+      });
       if(!fetched || !fetched?.ok){
+        logToStorage("Failed to get magic");
         if(!bg) Alert.alert("Not connected to IIIT Kottayam");
-        return;
+        return 1;
       }
       const ht = await fetched.text();
       const reg = new RegExp(/magic" value="([a-zA-Z0-9]+)"/gi)
       const r = Array.from(ht.matchAll(reg), m => m[1]);
       const magic = r[0];
+      logToStorage("POSTING login");
       const r2 = await fetch("http://172.16.222.1:1000/", {
         "headers": {
           "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
@@ -86,8 +103,14 @@ export default function App() {
         },
         "body": `4Tredir=http%3A%2F%2F172.16.222.1%3A1000%2Flogin%3F0330598d1f22608a&magic=${magic}&username=${user}&password=${encodeURI(pass)}`,
         "method": "POST"
-      }).catch(() => {});
-  
+      }).catch(e => e);
+      
+      if(!r2 || !r2.ok) {
+        logToStorage(`Failed to POST login: ${r2}`);
+        return 2;
+      }
+      
+      logToStorage("Checking keep alive");
       const nowConnectedFetch = await fetch("http://172.16.222.1:1000/keepalive?0001080905090609", {
         "headers": {
           "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
@@ -102,17 +125,20 @@ export default function App() {
         "method": "GET"
       }).catch(() => {});
       if(!nowConnectedFetch || !nowConnectedFetch.ok) {
+        logToStorage("Failed keep alive");
         if(!bg) Alert.alert("Incorrect Credentials");
-        return;
+        return 3;
       }
-      
+      logToStorage("Success");
       console.log('connected now')
       if(!bg) Alert.alert("Connected")
-      setLastLogin(Date.now());
+      updateLast();
     } catch (e) {
       if(!bg) Alert.alert("Error occured!");  
       console.error(e)
     }
+
+    
   }
 
   const verifyInfo = async () => {
@@ -127,13 +153,18 @@ export default function App() {
     } 
     return true;
   }
-  // const v = "ac" 
+  
   const readAll = async () => {
     setUserValue(await getUser() ?? "");
     setPassValue(await getPass() ?? "");
     setToggleValue((await getToggle()) == "true" ? true : false);
+    setLastLogin(new Date(parseInt(await getLast())) ?? new Date(0));
   }
   
+  const updateLast = async () => {
+    setLastLogin(new Date());
+    await setLast(Date.now().toString());
+  }
 
   const writeInfo = async () => {
     await setUser(user);
@@ -150,10 +181,12 @@ export default function App() {
     if(!toggle) {
       registerBackgroundFetchAsync();
       setListener(addEventListener(state => {
-        if(state.type == "wifi" && ((lastLogin + 1.5 * 60 * 60 * 1000) <= Date.now())){
+        // console.log(state.isWifiEnabled)
+        if(state.type == "wifi" && ((lastLogin.getTime() + 1 * 60 * 60 * 1000) <= Date.now())){ //  
+          // forceLogout();
           forceLogin(true);
         } else { 
-          console.log(`last logged in ${(Date.now() - lastLogin)/1000}`) 
+          console.log(`last logged in ${(Date.now() - lastLogin.getTime())/1000}`) 
         }
       }))
     } else {
@@ -174,33 +207,53 @@ export default function App() {
     }
   }
   
-  
+  const viewLogs = async () => {
+    const { getItem } = useAsyncStorage('logs');
+    const logs = JSON.parse(await getItem()) || [];
+    Alert.alert("Logs", logs.map(log => log.message).join('\n\n'));
+  }
+
   useEffect(() => {
     readAll();
     TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
-      forceLogin(true);
-      return BackgroundFetch.BackgroundFetchResult.NewData;
-    });
-    if(toggle){
-      setListener(addEventListener(state => {
-        if(state.type == "wifi" && ((lastLogin + 1.5 * 60 * 60 * 1000) <= Date.now())){
-          forceLogin(true);
-        } else { 
-          console.log(`last logged in ${(Date.now() - lastLogin)/1000}`) 
+      try {
+        await logToStorage("Background fetch task running");
+        if(await forceLogin(true) == 0){
+          await logToStorage("Background fetch task completed");
+          return BackgroundFetch.BackgroundFetchResult.NewData;
+        } else {
+          await logToStorage(`Background fetch task failed`);
+          return BackgroundFetch.BackgroundFetchResult.Failed;  
         }
-      }))  
-    }
-    
-    
-  }, []) 
+        
+      } catch (error) {
+        await logToStorage(`Background fetch task error: ${error}`);
+        return BackgroundFetch.BackgroundFetchResult.Failed;
+      }
+    });
   
+    if (toggle) {
+      setListener(addEventListener(state => {
+        if (state.type == "wifi" && ((lastLogin.getTime() + 1 * 60 * 60 * 1000) <= Date.now())) {
+          forceLogin(true);
+        } else {
+          logToStorage(`Stopped. Recently logged in;`);
+        }
+      }));
+    }
+  
+    registerBackgroundFetchAsync().catch(async error => {
+      await logToStorage(`Failed to register background fetch task: ${error}`);
+    });
+  
+  }, []);
   
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} 
     accessible={false}>
     <View style={styles.container}>
       <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%", paddingLeft: 15, paddingRight: 15, paddingTop: 15, alignItems: "center"}}>
-        <Text style={{color: "#878787", fontSize: 18, paddingLeft: 5}}>{toggle ? "WiFixing" : "Not WiFixing"}</Text>
+        <Text style={{color: "#878787", fontSize: 18, paddingLeft: 5}} onPress={viewLogs}>{toggle ? "WiFixing" : "Not WiFixing"} {lastLogin.toLocaleString('en-GB', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })}</Text>
         <Switch trackColor={{false: '#ddd', true: '#fff'}}
           thumbColor={toggle ? '#2e8bc0' : '#0c2d48'}
           ios_backgroundColor="#3e3e3e"
@@ -237,6 +290,7 @@ export default function App() {
           />
         </View>
         <Button title="Connect" onPress={submitted} style={styles.sub} color="#2e8bc0"/>
+        {/* <Button title="View Logs" onPress={viewLogs} style={styles.sub} color="#2e8bc0"/> */}
       </View>
 
       <View style={styles.footer}>
