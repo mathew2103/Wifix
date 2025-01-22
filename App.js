@@ -10,7 +10,7 @@ const BACKGROUND_FETCH_TASK = 'background-fetch';
 
 async function registerBackgroundFetchAsync() {
   return BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
-    minimumInterval: 5 * 60, //half an hour DEV
+    minimumInterval: 31 * 60, //half an hour DEV
     stopOnTerminate: false, // android only,
     startOnBoot: true, // android only
   });
@@ -112,12 +112,12 @@ export default function App() {
         "method": "POST"
       }).catch(async e => {
         await logToStorage(`Error posting login: ${e}`);
-        if (trial < 3) {
+        if (trial < 3) {  
           await logToStorage(`Failed login on try ${trial + 1}, trying in 5s | ${e}`);
-          setTimeout(async () => {
+          setTimeout(async () => {    
             await forceLogin(true);
           }, 5000)
-        } else {
+        } else {  
           await logToStorage(`Failed login on all trials | ${e}`);
           trial = 0;
           return null;
@@ -159,7 +159,6 @@ export default function App() {
     } catch (e) {
       if (!bg) Alert.alert("Error occured!");
       await logToStorage(`Uncaught Error: ${e}`);
-      // console.error(e)
       return e;
     }
 
