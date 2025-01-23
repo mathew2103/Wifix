@@ -69,18 +69,18 @@ export default function App() {
     try {
       logToStorage("GETTING magic")
       const fetched = await fetch("http://172.16.222.1:1000/login?0330598d1f22608a", {
-        "headers": {
-          "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-          "accept-language": "en-US,en",
-          "cache-control": "max-age=0",
-          "sec-gpc": "1",
-          "upgrade-insecure-requests": "1"
-        },
-        "referrerPolicy": "strict-origin-when-cross-origin",
-        "body": null,
+        // "headers": {
+        //   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        //   "accept-language": "en-US,en",
+        //   "cache-control": "max-age=0",
+        //   "sec-gpc": "1",
+        //   "upgrade-insecure-requests": "1"
+        // },
+        // "referrerPolicy": "strict-origin-when-cross-origin",
+        // "body": null,
         "method": "GET"
-      }).catch((error) => {
-        logToStorage(`Error fetching magic: ${error}`);
+      }).catch(async (error) => {
+        await logToStorage(`Error fetching magic: ${error}`);
       });
       if (!fetched || !fetched?.ok) {
         logToStorage("Failed to get magic");
@@ -98,16 +98,16 @@ export default function App() {
       await logToStorage("POSTING login");
 
       const r2 = fetch("http://172.16.222.1:1000/", {
-        "headers": {
-          "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-          "accept-language": "en-US,en",
-          "cache-control": "max-age=0",
-          "content-type": "application/x-www-form-urlencoded",
-          "sec-gpc": "1",
-          "upgrade-insecure-requests": "1",
-          "Referer": "http://172.16.222.1:1000/login?0330598d1f22608a",
-          "Referrer-Policy": "strict-origin-when-cross-origin"
-        },
+        // "headers": {
+        //   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        //   "accept-language": "en-US,en",
+        //   "cache-control": "max-age=0",
+        //   "content-type": "application/x-www-form-urlencoded",
+        //   "sec-gpc": "1",
+        //   "upgrade-insecure-requests": "1",
+        //   "Referer": "http://172.16.222.1:1000/login?0330598d1f22608a",
+        //   "Referrer-Policy": "strict-origin-when-cross-origin"
+        // },
         "body": `4Tredir=http%3A%2F%2F172.16.222.1%3A1000%2Flogin%3F0330598d1f22608a&magic=${magic}&username=${encodeURI(user)}&password=${encodeURI(pass)}`,
         "method": "POST"
       }).catch(async e => {
@@ -131,16 +131,16 @@ export default function App() {
       await new Promise(resolve => setTimeout(resolve, 1500));
       await logToStorage("Checking keep alive");
       const nowConnectedFetch = await fetch("http://172.16.222.1:1000/keepalive?0001080905090609", {
-        "headers": {
-          "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-          "accept-language": "en-US,en",
-          "cache-control": "max-age=0",
-          "sec-gpc": "1",
-          "upgrade-insecure-requests": "1",
-          "Referer": "http://172.16.222.1:1000/",
-          "Referrer-Policy": "strict-origin-when-cross-origin"
-        },
-        "body": null,
+        // "headers": {
+        //   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        //   "accept-language": "en-US,en",
+        //   "cache-control": "max-age=0",
+        //   "sec-gpc": "1",
+        //   "upgrade-insecure-requests": "1",
+        //   "Referer": "http://172.16.222.1:1000/",
+        //   "Referrer-Policy": "strict-origin-when-cross-origin"
+        // },
+        // "body": null,
         "method": "GET"
       }).catch(async (error) => {
         await logToStorage(`Error checking keep alive: ${error}`);
