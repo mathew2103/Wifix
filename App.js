@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, View, Button, TextInput, StatusBar, TouchableOpacity, Linking, Switch, Image, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { Alert, StyleSheet, Text, View, Button, TextInput, StatusBar, TouchableOpacity, Linking, Switch, Image, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { addEventListener } from "@react-native-community/netinfo";
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
