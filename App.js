@@ -101,12 +101,12 @@ export default function App() {
       // const r = Array.from(ht.matchAll(reg), m => m[1]);
       // const magic = r[0];
       const magic = ht.match(/magic" value="([a-zA-Z0-9]+)"/i)[1]
+
       
       await logToStorage("POSTING login");
 
-      const r2 = axios.post("http://172.16.222.1:1000/", {
-        magic, username: user, password: pass, '4Tredir': "http%3A%2F%2F172.16.222.1%3A1000%2Flogin%3F0330598d1f22608a"
-      })
+      const r2 = await axios.post("http://172.16.222.1:1000/", `magic=${magic}&username=${encodeURI(user)}&password=${encodeURI(pass)}`).catch(console.error)
+      
 
       // const r2 = fetch("http://172.16.222.1:1000/", {
       //   // "headers": {
@@ -119,7 +119,7 @@ export default function App() {
       //   //   "Referer": "http://172.16.222.1:1000/login?0330598d1f22608a",
       //   //   "Referrer-Policy": "strict-origin-when-cross-origin"
       //   // },
-      //   "body": `4Tredir=http%3A%2F%2F172.16.222.1%3A1000%2Flogin%3F0330598d1f22608a&magic=${magic}&username=${encodeURI(user)}&password=${encodeURI(pass)}`,
+      //   "body": `magic=${magic}&username=${encodeURI(user)}&password=${encodeURI(pass)}`,
       //   "method": "POST"
       // }).catch(async e => {
       //   await logToStorage(`Error posting login: ${e}`);
@@ -139,9 +139,9 @@ export default function App() {
         await logToStorage(`Failed to POST login: ${r2} | Trials: ${trial}`);
         return 2;
       }
-      await new Promise(resolve => setTimeout(resolve, 2500));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       await logToStorage("Checking keep alive");
-      const nowConnectedFetch = await axios.get("http://172.16.222.1:1000/keepalive?020e04030a040d03", {headers: {"Referrer-Policy": "strict-origin-when-cross-origin"}}).catch(async e => {
+      const nowConnectedFetch = await axios.get("http://172.16.222.1:1000/keepalive?020e04030a040d03").catch(async e => {
         console.log(e.code, e.message);
         await logToStorage(`ERR Keep alive: ${e.message}`);
         return null;
@@ -162,10 +162,10 @@ export default function App() {
       //   await logToStorage(`Error checking keep alive: ${error}`);
       //   return null
       // });
-      console.log(nowConnectedFetch)
+      
       if (!nowConnectedFetch || nowConnectedFetch.status !== 200) { //  nowConnectedFetch.status !== 200
         await logToStorage("Failed keep alive");
-        if (!bg) Alert.alert("Logged in. Keep alive page didnt respond.");
+        if (!bg) Alert.alert("Incorrect Credentials");
         return 3;
       }
       await logToStorage("Success");
