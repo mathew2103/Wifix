@@ -5,6 +5,7 @@ import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import { MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const BACKGROUND_FETCH_TASK = 'background-fetch';
 
@@ -68,27 +69,33 @@ export default function App() {
     trial++;
     try {
       logToStorage("GETTING magic")
-      const fetched = await fetch("http://172.16.222.1:1000/login?0330598d1f22608a", {
-        // "headers": {
-        //   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        //   "accept-language": "en-US,en",
-        //   "cache-control": "max-age=0",
-        //   "sec-gpc": "1",
-        //   "upgrade-insecure-requests": "1"
-        // },
-        // "referrerPolicy": "strict-origin-when-cross-origin",
-        // "body": null,
-        "method": "GET"
-      }).catch(async (error) => {
-        await logToStorage(`Error fetching magic: ${error}`);
-      });
-      if (!fetched || !fetched?.ok) {
+      const fetched = await axios.get("http://172.16.222.1:1000/login?0330598d1f22608a").catch(async (e) => {
+        console.log(e)
+        return await logToStorage(`Error fetching magic: ${e.code}`);
+      })
+
+      // return console.log(fetched.status)
+      // const fetched = await fetch("http://172.16.222.1:1000/login?0330598d1f22608a", {
+      //   // "headers": {
+      //   //   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      //   //   "accept-language": "en-US,en",
+      //   //   "cache-control": "max-age=0",
+      //   //   "sec-gpc": "1",
+      //   //   "upgrade-insecure-requests": "1"
+      //   // },
+      //   // "referrerPolicy": "strict-origin-when-cross-origin",
+      //   // "body": null,
+      //   "method": "GET"
+      // }).catch(async (error) => {
+      //   await logToStorage(`Error fetching magic: ${error}`);
+      // });
+      if (!fetched || fetched?.status !== 200) {
         logToStorage("Failed to get magic");
         if (!bg) Alert.alert("Not connected to IIIT Kottayam");
         return 1;
       }
       await logToStorage("Got magic");
-      const ht = await fetched.text();
+      const ht = fetched.data;
 
       // const reg = new RegExp(/magic" value="([a-zA-Z0-9]+)"/i)
       // const r = Array.from(ht.matchAll(reg), m => m[1]);
@@ -97,57 +104,68 @@ export default function App() {
       
       await logToStorage("POSTING login");
 
-      const r2 = fetch("http://172.16.222.1:1000/", {
-        // "headers": {
-        //   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        //   "accept-language": "en-US,en",
-        //   "cache-control": "max-age=0",
-        //   "content-type": "application/x-www-form-urlencoded",
-        //   "sec-gpc": "1",
-        //   "upgrade-insecure-requests": "1",
-        //   "Referer": "http://172.16.222.1:1000/login?0330598d1f22608a",
-        //   "Referrer-Policy": "strict-origin-when-cross-origin"
-        // },
-        "body": `4Tredir=http%3A%2F%2F172.16.222.1%3A1000%2Flogin%3F0330598d1f22608a&magic=${magic}&username=${encodeURI(user)}&password=${encodeURI(pass)}`,
-        "method": "POST"
-      }).catch(async e => {
-        await logToStorage(`Error posting login: ${e}`);
-        if (trial < 3) {  
-          await logToStorage(`Failed login on try ${trial + 1}, trying in 5s | ${e}`);
-          setTimeout(async () => {    
-            await forceLogin(true);
-          }, 5000)
-        } else {  
-          await logToStorage(`Failed login on all trials | ${e}`);
-          trial = 0;
-          return null;
-        }
+      const r2 = axios.post("http://172.16.222.1:1000/", {
+        magic, username: user, password: pass, '4Tredir': "http%3A%2F%2F172.16.222.1%3A1000%2Flogin%3F0330598d1f22608a"
       })
+
+      // const r2 = fetch("http://172.16.222.1:1000/", {
+      //   // "headers": {
+      //   //   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      //   //   "accept-language": "en-US,en",
+      //   //   "cache-control": "max-age=0",
+      //   //   "content-type": "application/x-www-form-urlencoded",
+      //   //   "sec-gpc": "1",
+      //   //   "upgrade-insecure-requests": "1",
+      //   //   "Referer": "http://172.16.222.1:1000/login?0330598d1f22608a",
+      //   //   "Referrer-Policy": "strict-origin-when-cross-origin"
+      //   // },
+      //   "body": `4Tredir=http%3A%2F%2F172.16.222.1%3A1000%2Flogin%3F0330598d1f22608a&magic=${magic}&username=${encodeURI(user)}&password=${encodeURI(pass)}`,
+      //   "method": "POST"
+      // }).catch(async e => {
+      //   await logToStorage(`Error posting login: ${e}`);
+      //   if (trial < 3) {  
+      //     await logToStorage(`Failed login on try ${trial + 1}, trying in 5s | ${e}`);
+      //     setTimeout(async () => {    
+      //       await forceLogin(true);
+      //     }, 5000)
+      //   } else {  
+      //     await logToStorage(`Failed login on all trials | ${e}`);
+      //     trial = 0;
+      //     return null;
+      //   }
+      // })
 
       if (!r2) {
         await logToStorage(`Failed to POST login: ${r2} | Trials: ${trial}`);
         return 2;
       }
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 2500));
       await logToStorage("Checking keep alive");
-      const nowConnectedFetch = await fetch("http://172.16.222.1:1000/keepalive?0001080905090609", {
-        // "headers": {
-        //   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        //   "accept-language": "en-US,en",
-        //   "cache-control": "max-age=0",
-        //   "sec-gpc": "1",
-        //   "upgrade-insecure-requests": "1",
-        //   "Referer": "http://172.16.222.1:1000/",
-        //   "Referrer-Policy": "strict-origin-when-cross-origin"
-        // },
-        // "body": null,
-        "method": "GET"
-      }).catch(async (error) => {
-        await logToStorage(`Error checking keep alive: ${error}`);
+      const nowConnectedFetch = await axios.get("http://172.16.222.1:1000/keepalive?020e04030a040d03", {headers: {"Referrer-Policy": "strict-origin-when-cross-origin"}}).catch(async e => {
+        console.log(e.code, e.message);
+        await logToStorage(`ERR Keep alive: ${e.message}`);
+        return null;
       });
-      if (!nowConnectedFetch || !nowConnectedFetch.ok) {
+      // const nowConnectedFetch = await fetch("http://172.16.222.1:1000/keepalive?0001080905090609", {
+      //   "headers": {
+      //     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      //     "accept-language": "en-US,en",
+      //     "cache-control": "max-age=0",
+      //     "sec-gpc": "1",
+      //     "upgrade-insecure-requests": "1",
+      //     "Referer": "http://172.16.222.1:1000/",
+      //     "Referrer-Policy": "strict-origin-when-cross-origin"
+      //   },
+      //   "body": null,
+      //   "method": "GET"
+      // }).catch(async (error) => {
+      //   await logToStorage(`Error checking keep alive: ${error}`);
+      //   return null
+      // });
+      console.log(nowConnectedFetch)
+      if (!nowConnectedFetch || nowConnectedFetch.status !== 200) { //  nowConnectedFetch.status !== 200
         await logToStorage("Failed keep alive");
-        if (!bg) Alert.alert("Incorrect Credentials");
+        if (!bg) Alert.alert("Logged in. Keep alive page didnt respond.");
         return 3;
       }
       await logToStorage("Success");
