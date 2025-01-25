@@ -71,80 +71,29 @@ export default function App() {
     const loginPass = await getPass();
     trial++;
     try {
-      logToStorage("GETTING magic")
+      await logToStorage("GETTING magic")
       const fetched = await axios.get("http://172.16.222.1:1000/login?0330598d1f22608a").catch(async (e) => {
         console.log(e)
         return await logToStorage(`Error fetching magic: ${e.code}`);
       })
 
-      // return console.log(fetched.status)
-      // const fetched = await fetch("http://172.16.222.1:1000/login?0330598d1f22608a", {
-      //   // "headers": {
-      //   //   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-      //   //   "accept-language": "en-US,en",
-      //   //   "cache-control": "max-age=0",
-      //   //   "sec-gpc": "1",
-      //   //   "upgrade-insecure-requests": "1"
-      //   // },
-      //   // "referrerPolicy": "strict-origin-when-cross-origin",
-      //   // "body": null,
-      //   "method": "GET"
-      // }).catch(async (error) => {
-      //   await logToStorage(`Error fetching magic: ${error}`);
-      // });
       if (!fetched || fetched?.status !== 200) {
         logToStorage("Failed to get magic");
         if (!bg) Alert.alert("Not connected to IIIT Kottayam");
         return 1;
       }
-      await logToStorage("Got magic");
-      const ht = fetched.data;
-
-      // const reg = new RegExp(/magic" value="([a-zA-Z0-9]+)"/i)
-      // const r = Array.from(ht.matchAll(reg), m => m[1]);
-      // const magic = r[0];
-      const magic = ht.match(/magic" value="([a-zA-Z0-9]+)"/i)[1]
+      
+      const magic = fetched.data.match(/magic" value="([a-zA-Z0-9]+)"/i)[1];
 
       await logToStorage("POSTING login");
-
       const r2 = await axios.post("http://172.16.222.1:1000/", `magic=${magic}&username=${encodeURI(loginUser)}&password=${encodeURI(loginPass)}`).catch(async e => {
         console.log(e.code, e.message);
-        await logToStorage(`ERR Posting: ${e.message}`);
-        
+        await logToStorage(`ERR Posting: ${e.message}`);  
         return null;
       });
-      await logToStorage(`Posted login | ${loginUser} | ${loginPass[0]}`);
-      
-
-      // const r2 = fetch("http://172.16.222.1:1000/", {
-      //   // "headers": {
-      //   //   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-      //   //   "accept-language": "en-US,en",
-      //   //   "cache-control": "max-age=0",
-      //   //   "content-type": "application/x-www-form-urlencoded",
-      //   //   "sec-gpc": "1",
-      //   //   "upgrade-insecure-requests": "1",
-      //   //   "Referer": "http://172.16.222.1:1000/login?0330598d1f22608a",
-      //   //   "Referrer-Policy": "strict-origin-when-cross-origin"
-      //   // },
-      //   "body": `magic=${magic}&username=${encodeURI(user)}&password=${encodeURI(pass)}`,
-      //   "method": "POST"
-      // }).catch(async e => {
-      //   await logToStorage(`Error posting login: ${e}`);
-      //   if (trial < 3) {  
-      //     await logToStorage(`Failed login on try ${trial + 1}, trying in 5s | ${e}`);
-      //     setTimeout(async () => {    
-      //       await forceLogin(true);
-      //     }, 5000)
-      //   } else {  
-      //     await logToStorage(`Failed login on all trials | ${e}`);
-      //     trial = 0;
-      //     return null;
-      //   }
-      // })
+      await logToStorage(`Posted login`);
 
       if (!r2) {
-        // await logToStorage(`Failed to POST login: ${r2} | Trials: ${trial}`);
         if (trial < 3) {  
           await logToStorage(`Failed login on try ${trial}, trying in 5s | ${e}`);
           Alert.alert("Failed login. Trying again in 5s");
@@ -155,47 +104,11 @@ export default function App() {
           trial = 0;
           return 2;
         }
-        // return 2;
       }else if(r2.data.includes("failed")){
         await logToStorage(`Failed login ${loginUser} | ${loginPass[0]}`);
         if (!bg) Alert.alert("Incorrect Credentials");
         return 3;
       }
-
-      /* KEEP ALIVE CODE
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      await logToStorage("Checking keep alive");
-      const nowConnectedFetch = await axios.get("http://172.16.222.1:1000/keepalive?020e04030a040d03").catch(async e => {
-        console.log(e.code, e.message);
-        await logToStorage(`ERR Keep alive: ${e.message}`);
-        return null;
-      });
-      if (!nowConnectedFetch || nowConnectedFetch.status !== 200) { //  nowConnectedFetch.status !== 200
-        await logToStorage("Failed keep alive");
-        if (!bg) Alert.alert("Incorrect Credentials");
-        return 3;
-      }
-      */
-
-
-
-      // const nowConnectedFetch = await fetch("http://172.16.222.1:1000/keepalive?0001080905090609", {
-      //   "headers": {
-      //     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-      //     "accept-language": "en-US,en",
-      //     "cache-control": "max-age=0",
-      //     "sec-gpc": "1",
-      //     "upgrade-insecure-requests": "1",
-      //     "Referer": "http://172.16.222.1:1000/",
-      //     "Referrer-Policy": "strict-origin-when-cross-origin"
-      //   },
-      //   "body": null,
-      //   "method": "GET"
-      // }).catch(async (error) => {
-      //   await logToStorage(`Error checking keep alive: ${error}`);
-      //   return null
-      // });
-      
       
       await logToStorage("Success");
       console.log('connected now')
@@ -248,13 +161,10 @@ export default function App() {
   }
 
   const tapToggle = () => {
-    // setToggleValue(!toggle)
     if (!toggle) {
       registerBackgroundFetchAsync();
       setListener(addEventListener(state => {
-        // console.log(state.isWifiEnabled)
-        if (state.type == "wifi" && ((lastLogin.getTime() + 1 * 60 * 60 * 1000) <= Date.now())) { //  
-          // forceLogout();
+        if (state.type == "wifi" && ((lastLogin.getTime() + 1 * 60 * 60 * 1000) <= Date.now())) {
           forceLogin(true);
         } else {
           console.log(`last logged in ${(Date.now() - lastLogin.getTime()) / 1000}`)
@@ -333,14 +243,10 @@ export default function App() {
             value={toggle} style={styles.switch} />
         </View>
         <Image source={require("./assets/mainIcon.png")} style={styles.icon} />
-        {/* <Suspense fallback={null}>
-          <Text style={{color: "#222"}}>last run {lastRun?.toString()}</Text>
-        </Suspense> */}
         <View style={styles.form}>
           <Text style={{ color: "#fff", marginBottom: 5, fontSize: 16 }}>Username</Text>
           <TextInput
             style={styles.input}
-            // placeholder='2024BCD0000'
             onChangeText={setUserValue}
             defaultValue={user}
           />
@@ -362,7 +268,6 @@ export default function App() {
             />
           </View>
           <Button title="Connect" onPress={submitted} style={styles.sub} color="#2e8bc0" />
-          {/* <Button title="View Logs" onPress={viewLogs} style={styles.sub} color="#2e8bc0"/> */}
         </View>
 
         <View style={styles.footer}>
@@ -371,11 +276,6 @@ export default function App() {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => Linking.openURL("https://www.instagram.com/basi__gar")}>
             <Text style={styles.footerText}>Logo by Muhammed Basil</Text>
-
-            {/* <View style={{justifyContent: "center", display: "flex", alignItems: "center", flexDirection: "row"}}>
-             <Feather color="white" size={15} name='external-link'/> 
-            </View> */}
-
           </TouchableOpacity>
 
 
