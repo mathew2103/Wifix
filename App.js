@@ -27,7 +27,7 @@ const logToStorage = async (message) => {
 
   logs.unshift({ timestamp, message: `${timestamp}: ${message}` });
 
-  // if (logs.length > 10) logs = logs.slice(0, 10);
+  if (logs.length > 20) logs = logs.slice(0, 10);
   await setItem(JSON.stringify(logs));
 };
 
@@ -66,6 +66,9 @@ export default function App() {
   let trial = 0;
   const forceLogin = async (bg = false) => {
     console.log("logging in")
+
+    const loginUser = await getUser();
+    const loginPass = await getPass();
     trial++;
     try {
       logToStorage("GETTING magic")
@@ -102,10 +105,15 @@ export default function App() {
       // const magic = r[0];
       const magic = ht.match(/magic" value="([a-zA-Z0-9]+)"/i)[1]
 
-      
       await logToStorage("POSTING login");
 
-      const r2 = await axios.post("http://172.16.222.1:1000/", `magic=${magic}&username=${encodeURI(user)}&password=${encodeURI(pass)}`).catch(console.error)
+      const r2 = await axios.post("http://172.16.222.1:1000/", `magic=${magic}&username=${encodeURI(loginUser)}&password=${encodeURI(loginPass)}`).catch(async e => {
+        console.log(e.code, e.message);
+        await logToStorage(`ERR Posting: ${e.message}`);
+        
+        return null;
+      });
+      await logToStorage(`Posted login | ${loginUser} | ${loginPass[0]}`);
       
 
       // const r2 = fetch("http://172.16.222.1:1000/", {
@@ -136,9 +144,25 @@ export default function App() {
       // })
 
       if (!r2) {
-        await logToStorage(`Failed to POST login: ${r2} | Trials: ${trial}`);
-        return 2;
+        // await logToStorage(`Failed to POST login: ${r2} | Trials: ${trial}`);
+        if (trial < 3) {  
+          await logToStorage(`Failed login on try ${trial}, trying in 5s | ${e}`);
+          Alert.alert("Failed login. Trying again in 5s");
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          return await forceLogin(true);
+        } else {  
+          await logToStorage(`Failed login on all trials | ${e}`);
+          trial = 0;
+          return 2;
+        }
+        // return 2;
+      }else if(r2.data.includes("failed")){
+        await logToStorage(`Failed login ${loginUser} | ${loginPass[0]}`);
+        if (!bg) Alert.alert("Incorrect Credentials");
+        return 3;
       }
+
+      /* KEEP ALIVE CODE
       await new Promise(resolve => setTimeout(resolve, 1500));
       await logToStorage("Checking keep alive");
       const nowConnectedFetch = await axios.get("http://172.16.222.1:1000/keepalive?020e04030a040d03").catch(async e => {
@@ -146,6 +170,15 @@ export default function App() {
         await logToStorage(`ERR Keep alive: ${e.message}`);
         return null;
       });
+      if (!nowConnectedFetch || nowConnectedFetch.status !== 200) { //  nowConnectedFetch.status !== 200
+        await logToStorage("Failed keep alive");
+        if (!bg) Alert.alert("Incorrect Credentials");
+        return 3;
+      }
+      */
+
+
+
       // const nowConnectedFetch = await fetch("http://172.16.222.1:1000/keepalive?0001080905090609", {
       //   "headers": {
       //     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
@@ -163,11 +196,7 @@ export default function App() {
       //   return null
       // });
       
-      if (!nowConnectedFetch || nowConnectedFetch.status !== 200) { //  nowConnectedFetch.status !== 200
-        await logToStorage("Failed keep alive");
-        if (!bg) Alert.alert("Incorrect Credentials");
-        return 3;
-      }
+      
       await logToStorage("Success");
       console.log('connected now')
       if (!bg) Alert.alert("Connected")
