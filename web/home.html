@@ -37,10 +37,11 @@
         .screenshot {
             border: #224 solid 5px;
             border-radius: 35px;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             height: 55vh;
             box-shadow: 0px 0px 30px #2e8bc0;
-            margin-top: 30px;
+            margin-top: 20px;
+            /* margin-bottom: 5px; */
         }
 
         .features {
@@ -51,12 +52,13 @@
         }
 
         .download-button {
-            padding: 10px 20px;
+            padding: 11.5px;
             background-color: #2e8bc0;
             color: white;
             text-decoration: none;
             border-radius: 5px;
             height: 25px;
+            
         }
 
         .hero {
@@ -64,9 +66,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 10px;
+            padding: 0 15px;
             box-shadow: 0px 0px 30px #2e8bc079;
-
+            border-radius: 0px 0px 20px 20px;
             height: 80px;
 
         }
@@ -104,14 +106,26 @@
             bottom: 0;
             position: absolute;
             display: flex;
-            width: 100%;
+            flex-direction: column;
             justify-content: center;
-            font-size: 28px;
+            font-size: 25px;
+            gap: 5px;
             background-color: #111;
             border-radius: 50px 50px 0 0 ;
-            padding: 25px 0;
+            padding: 35px 0 35px 0;
             /* align-items: center; */
             box-shadow: 0px 0px 30px #2e8bc079;
+            max-width: 400px;
+            max-height: 4.5vh;
+            
+            @media (min-width: 768px) {
+                max-height: 2.5vw;
+            }
+            left:0;
+            right:0;
+            margin: 0 auto;
+            
+
         }
 
         .mainText {
@@ -120,23 +134,25 @@
             font-style: italic;
             
         }
+        
         .special {
             margin: 0;
+            font-size: 24px;
+            display: inline;
         }
-        
+        .bottomBarText {
+            font-size: 16px;
+            color: #777;
+            margin: 0px auto;
+            text-decoration: none;
+        }
+        .credits {
+            display: flex;
+            flex-direction: column;
+            height: 100px;
+        }
     </style>
 </head>
-
-<!--  -->
- <!-- let texts = ["Python", "Web Development", "Node.js", "Discord Bots", "Formula 1", "Music"];
-                if(screen.width < 768) texts = texts.filter(a => a.length < 12);
-                // sec1.style["pointer-events"] = none;
-                var typed = new Typed(".autotype", {
-                strings: texts,
-                typeSpeed: 145,
-                backSpeed: 120,
-                loop: true
-                }); -->
 
 <body>
     <div class="container">
@@ -163,9 +179,15 @@
             <img src="../assets/appScreenshot.jpeg" alt="App Screenshot" class="screenshot">
         </div>
         <div class="bottomBar">
-            <p class="autotype special"></p>
+            <div class=""><p class="autotype special"></p></div>
+            <div class="credits">
+                <a class="bottomBarText" href="https://www.linkedin.com/in/mathewmanachery/">Developed by Mathew Manachery</a>
+                <a class="bottomBarText" href="https://www.linkedin.com/in/muhammed-basil-5b1144326/">Logo by Muhammed Basil</a>
+            </div>
         </div>
     </div>
+
+
     <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
     <script>
         const downloadButton = document.querySelector('.download-button');
