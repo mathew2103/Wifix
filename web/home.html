@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFix</title>
+    <link rel="icon" href="../assets/icon2.png" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&display=swap"
+        rel="stylesheet">
+    <style type="text/css">
+        
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+
+            height: 100vh;
+            background-color: #000;
+            color: white;
+            font-family: "Cabin", Arial, sans-serif;
+            font-weight: 200;
+
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .logo {
+            width: 60px;
+
+        }
+
+        .screenshot {
+            border: #224 solid 5px;
+            border-radius: 35px;
+            margin-bottom: 10px;
+            height: 55vh;
+            box-shadow: 0px 0px 30px #2e8bc0;
+            margin-top: 30px;
+        }
+
+        .features {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+
+        .download-button {
+            padding: 10px 20px;
+            background-color: #2e8bc0;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            height: 25px;
+        }
+
+        .hero {
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            box-shadow: 0px 0px 30px #2e8bc079;
+
+            height: 80px;
+
+        }
+
+        .hero1 {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .main {
+            
+            margin: 10px 20px;
+            gap: 5px;
+            justify-content: space-around;
+        }
+
+        .upcomingInfo {
+            font-size: smaller;
+            background-color: #333333e1;
+            padding: 8px 5px;
+            position: absolute;
+            bottom: -80px;
+            display: none;
+            border-radius: 5px;
+        }
+
+        .downloadDiv {
+            position: relative;
+            justify-content: center;
+            display: flex;
+        }
+
+        .bottomBar {
+            bottom: 0;
+            position: absolute;
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            font-size: 28px;
+            background-color: #111;
+            border-radius: 50px 50px 0 0 ;
+            padding: 25px 0;
+            /* align-items: center; */
+            box-shadow: 0px 0px 30px #2e8bc079;
+        }
+
+        .mainText {
+            margin-top: 40px;
+            text-shadow: 0px 0px 10px #2e8bc0;
+            font-style: italic;
+            
+        }
+        .special {
+            margin: 0;
+        }
+        
+    </style>
+</head>
+
+<!--  -->
+ <!-- let texts = ["Python", "Web Development", "Node.js", "Discord Bots", "Formula 1", "Music"];
+                if(screen.width < 768) texts = texts.filter(a => a.length < 12);
+                // sec1.style["pointer-events"] = none;
+                var typed = new Typed(".autotype", {
+                strings: texts,
+                typeSpeed: 145,
+                backSpeed: 120,
+                loop: true
+                }); -->
+
+<body>
+    <div class="container">
+        <div class="hero">
+            <div class="hero1">
+                <img src="../assets/icon2.png" alt="Wifix" class="logo">
+                <h1>WiFiX</h1>
+            </div>
+
+            <div class="downloadDiv">
+                <img src="../assets/download-circular-button.png" alt="Download" class="download-button" >
+                <!-- <a href="#" class="download-button">Download Now</a>
+                  -->
+                  <!-- <a href="https://www.flaticon.com/free-icons/download" title="download icons" class="download-button">Download icons created by Catalin Fertu - Flaticon</a> -->
+                <div class="upcomingInfo">
+                    Browser Extension<br>Coming Soon!
+                </div>
+            </div>
+
+        </div>
+        <div class="main">
+            <h2 class="mainText">Never login to WiFi ever again!</h2>
+
+            <img src="../assets/appScreenshot.jpeg" alt="App Screenshot" class="screenshot">
+        </div>
+        <div class="bottomBar">
+            <p class="autotype special"></p>
+        </div>
+    </div>
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <script>
+        const downloadButton = document.querySelector('.download-button');
+        const upcomingInfo = document.querySelector('.upcomingInfo');
+        const userAgent = navigator.userAgent;
+        let downloadUrl = 'https://github.com/mathew2103/WiFix/releases/download/v1.1.0/Wifix.v1.1.apk';
+
+        fetch('https://api.github.com/repos/mathew2103/WiFix/releases/latest')
+            .then(response => response.json())
+            .then(data => {
+                downloadUrl = data.assets[0].browser_download_url;
+            })
+            .catch(error => console.error('Error fetching latest release:', error));
+        if (!(userAgent.match(/iPhone/i) || userAgent.match(/Android/i))) {
+            downloadButton.style.cursor = 'not-allowed';
+            downloadButton.addEventListener('mouseover', () => {
+                upcomingInfo.style.display = 'block';
+            });
+            downloadButton.addEventListener('mouseout', () => {
+                upcomingInfo.style.display = 'none';
+            });
+        } else {
+            downloadButton.addEventListener('click', (e) => {
+                window.location.href = downloadUrl;
+            });
+        }
+
+
+        let texts = ["Simple UI", "Auto Login", "Seamless Updates", "Low Battery Consumption"];
+        // if(screen.width < 768) texts = texts.filter(a => a.length < 12);
+        // sec1.style["pointer-events"] = none;
+        var typed = new Typed(".autotype", {
+            strings: texts,
+            typeSpeed: 145,
+            backSpeed: 120,
+            loop: true,
+            fadeOut: true
+        });
+    </script>
+</body>
+
+</html>
