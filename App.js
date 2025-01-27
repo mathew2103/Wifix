@@ -15,7 +15,7 @@ async function registerBackgroundFetchAsync() {
     stopOnTerminate: false, // android only,
     startOnBoot: true, // android only
   });
-}
+} 
 async function unregisterBackgroundFetchAsync() {
   return BackgroundFetch.unregisterTaskAsync(BACKGROUND_FETCH_TASK);
 }
@@ -40,7 +40,7 @@ export default function App() {
   const { getItem: getToggle, setItem: setToggle } = useAsyncStorage("toggle");
   const { getItem: getLast, setItem: setLast } = useAsyncStorage('last');
   const [lastLogin, setLastLogin] = useState(new Date(0));
-  const [listener, setListener] = useState(undefined);
+  let listener = undefined;
 
   const [showPass, setShowPass] = useState(false);
   const toggleShowPassword = () => {
@@ -74,7 +74,7 @@ export default function App() {
       await logToStorage("GETTING magic")
       const fetched = await axios.get("http://172.16.222.1:1000/login?0330598d1f22608a").catch(async (e) => {
         console.log(e)
-        return await logToStorage(`Error fetching magic: ${e.code}`);
+        return await logToStorage(`Error fetching magic: ${e?.code}`);
       })
 
       if (!fetched || fetched?.status !== 200) {
@@ -87,15 +87,15 @@ export default function App() {
 
       await logToStorage("POSTING login");
       const r2 = await axios.post("http://172.16.222.1:1000/", `magic=${magic}&username=${encodeURI(loginUser)}&password=${encodeURI(loginPass)}`).catch(async e => {
-        console.log(e.code, e.message);
-        await logToStorage(`ERR Posting: ${e.message}`);  
+        console.log(e);
+        await logToStorage(`ERR Posting: ${e?.message}`);  
         return null;
       });
       await logToStorage(`Posted login`);
 
       if (!r2) {
         if (trial < 3) {  
-          await logToStorage(`Failed login on try ${trial}, trying in 5s | ${e}`);
+          await logToStorage(`Failed login on try ${trial}`);
           Alert.alert("Failed login. Trying again in 5s");
           await new Promise(resolve => setTimeout(resolve, 5000));
           return await forceLogin(true);
@@ -112,12 +112,13 @@ export default function App() {
       
       await logToStorage("Success");
       console.log('connected now')
-      if (!bg) Alert.alert("Connected")
+      if (!bg) Alert.alert("Connected");
       await updateLast();
       trial = 0;
       return 0;
     } catch (e) {
       if (!bg) Alert.alert("Error occured!");
+      console.error(e);
       await logToStorage(`Uncaught Error: ${e}`);
       return e;
     }
@@ -163,7 +164,7 @@ export default function App() {
   const tapToggle = () => {
     if (!toggle) {
       registerBackgroundFetchAsync();
-      setListener(addEventListener(state => {
+      listener = (addEventListener(state => {
         if (state.type == "wifi" && ((lastLogin.getTime() + 1 * 60 * 60 * 1000) <= Date.now())) {
           forceLogin(true);
         } else {
@@ -181,7 +182,7 @@ export default function App() {
 
   const submitted = async () => {
 
-    if (await verifyInfo() || true) {
+    if (await verifyInfo()) {
       writeInfo();
       forceLogout();
       forceLogin(false);
@@ -215,7 +216,7 @@ export default function App() {
     });
 
     if (toggle) {
-      setListener(addEventListener(state => {
+      listener = (addEventListener(state => {
         if (state.type == "wifi" && ((lastLogin.getTime() + 1 * 60 * 60 * 1000) <= Date.now())) {
           forceLogin(true);
         } else {
@@ -253,7 +254,7 @@ export default function App() {
           <Text style={{ color: "#fff", marginBottom: 5, fontSize: 16 }}>Password</Text>
           <View style={styles.passContainer}>
             <TextInput
-              placeholder='_________________'
+              // placeholder='_________________'
               onChangeText={setPassValue}
               secureTextEntry={!showPass}
               defaultValue={pass}
@@ -268,20 +269,21 @@ export default function App() {
             />
           </View>
           <Button title="Connect" onPress={submitted} style={styles.sub} color="#2e8bc0" />
+          <Text style={{color: "#878787", paddingTop: "6", alignSelf: "center"}}><AntDesign name="infocirlceo" size={15} color="#878787" /> Lock the app in recent tasks</Text>
         </View>
 
         <View style={styles.footer}>
-          <TouchableOpacity onPress={() => Linking.openURL("https://www.instagram.com/mathew._21")}>
+          <TouchableOpacity onPress={() => Linking.openURL("https://www.linkedin.com/in/mathewmanachery/")}>
             <Text style={styles.footerText}>Developed by Mathew Manachery</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => Linking.openURL("https://www.instagram.com/basi__gar")}>
+          <TouchableOpacity onPress={() => Linking.openURL("https://www.linkedin.com/in/muhammed-basil-5b1144326/")}>
             <Text style={styles.footerText}>Logo by Muhammed Basil</Text>
           </TouchableOpacity>
 
 
           <TouchableOpacity onPress={() => Linking.openURL("https://github.com/mathew2103/wifix")} style={{ justifyContent: "center", display: "flex", alignItems: "center", flexDirection: "row" }}>
             <Text style={styles.footerText}>Version {require("./app.json").expo.version}</Text>
-            <AntDesign color="white" size={20} name='github' style={{ alignContent: "center", alignSelf: "center", paddingLeft: 5 }} />
+            <AntDesign color="white" size={16} name='github' style={{ alignContent: "center", alignSelf: "center", paddingLeft: 5 }} />
           </TouchableOpacity>
 
 
@@ -310,8 +312,9 @@ const styles = StyleSheet.create({
   footerText: {
     color: "#fff",
     alignSelf: "center",
-    marginBottom: 3,
-    textAlign: "center"
+    marginBottom: 2,
+    textAlign: "center",
+    paddingTop: 1
   },
   form: {
     flex: 0.6
