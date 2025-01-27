@@ -98,7 +98,7 @@ export default function App() {
           await logToStorage(`Failed login on try ${trial}`);
           Alert.alert("Failed login. Trying again in 5s");
           await new Promise(resolve => setTimeout(resolve, 5000));
-          return await forceLogin(true);
+          return await forceLogin(bg);
         } else {  
           await logToStorage(`Failed login on all trials | ${e}`);
           trial = 0;
