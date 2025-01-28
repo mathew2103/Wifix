@@ -11,7 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&display=swap"
         rel="stylesheet">
     <style type="text/css">
-        
         body {
             margin: 0;
             padding: 0;
@@ -58,7 +57,7 @@
             text-decoration: none;
             border-radius: 5px;
             height: 25px;
-            
+
         }
 
         .hero {
@@ -66,7 +65,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 15px;
+            padding: 0 25px;
             box-shadow: 0px 0px 30px #2e8bc079;
             border-radius: 0px 0px 20px 20px;
             height: 80px;
@@ -80,7 +79,7 @@
         }
 
         .main {
-            
+
             margin: 10px 20px;
             gap: 5px;
             justify-content: space-around;
@@ -111,20 +110,21 @@
             font-size: 25px;
             gap: 5px;
             background-color: #111;
-            border-radius: 50px 50px 0 0 ;
+            border-radius: 50px 50px 0 0;
             padding: 35px 0 35px 0;
             /* align-items: center; */
             box-shadow: 0px 0px 30px #2e8bc079;
             max-width: 400px;
             max-height: 4.5vh;
-            
+
             @media (min-width: 768px) {
                 max-height: 2.5vw;
             }
+
             left:0;
             right:0;
             margin: 0 auto;
-            
+
 
         }
 
@@ -132,24 +132,34 @@
             margin-top: 40px;
             text-shadow: 0px 0px 10px #2e8bc0;
             font-style: italic;
-            
+
         }
-        
+
         .special {
             margin: 0;
             font-size: 24px;
             display: inline;
         }
+
         .bottomBarText {
             font-size: 16px;
             color: #777;
             margin: 0px auto;
             text-decoration: none;
         }
+
         .credits {
             display: flex;
             flex-direction: column;
             height: 100px;
+        }
+        .github-button {
+            padding: 11.5px;
+            background-color: #fff;
+            margin-right: 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            height: 25px;
         }
     </style>
 </head>
@@ -162,13 +172,18 @@
                 <h1>WiFiX</h1>
             </div>
 
-            <div class="downloadDiv">
-                <img src="../assets/download-circular-button.png" alt="Download" class="download-button" >
-                <!-- <a href="#" class="download-button">Download Now</a>
+            <div class="heroButtons">
+
+                <div class="downloadDiv">
+                    <a href="https://github.com/mathew2103/WiFix">
+                    <img src="../assets/github.png" alt="Github" class="github-button"></a>
+                    <img src="../assets/download-circular-button.png" alt="Download" class="download-button">
+                    <!-- <a href="#" class="download-button">Download Now</a>
                   -->
-                  <!-- <a href="https://www.flaticon.com/free-icons/download" title="download icons" class="download-button">Download icons created by Catalin Fertu - Flaticon</a> -->
-                <div class="upcomingInfo">
-                    Browser Extension<br>Coming Soon!
+                    <!-- <a href="https://www.flaticon.com/free-icons/download" title="download icons" class="download-button">Download icons created by Catalin Fertu - Flaticon</a> -->
+                    <div class="upcomingInfo">
+                        Browser Extension<br>Coming Soon!
+                    </div>
                 </div>
             </div>
 
@@ -179,10 +194,14 @@
             <img src="../assets/appScreenshot.jpeg" alt="App Screenshot" class="screenshot">
         </div>
         <div class="bottomBar">
-            <div class=""><p class="autotype special"></p></div>
+            <div class="">
+                <p class="autotype special"></p>
+            </div>
             <div class="credits">
-                <a class="bottomBarText" href="https://www.linkedin.com/in/mathewmanachery/">Developed by Mathew Manachery</a>
-                <a class="bottomBarText" href="https://www.linkedin.com/in/muhammed-basil-5b1144326/">Logo by Muhammed Basil</a>
+                <a class="bottomBarText" href="https://www.linkedin.com/in/mathewmanachery/">Developed by Mathew
+                    Manachery</a>
+                <a class="bottomBarText" href="https://www.linkedin.com/in/muhammed-basil-5b1144326/">Logo by Muhammed
+                    Basil</a>
             </div>
         </div>
     </div>
