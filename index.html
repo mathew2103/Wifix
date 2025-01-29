@@ -33,13 +33,18 @@
         }
 
         .screenshot {
-            border: #224 solid 5px;
+            border: #224 solid 4.95px;
             border-radius: 35px;
             margin-bottom: 20px;
             height: 55vh;
-            box-shadow: 0px 0px 30px #2e8bc0;
+            box-shadow: 0px 0px 20px #2e8bc0;
+            transition: 0.25s;
             margin-top: 5px;
             /* margin-bottom: 5px; */
+        }
+        .screenshot:hover {
+            box-shadow: 0px 0px 20px #2e8bc0,0px 0px 25px #224;
+            
         }
 
         .features {
@@ -84,7 +89,7 @@
             justify-content: space-around;
         }
 
-        .upcomingInfo {
+        .upcomingInfo, .iosUpcomingInfo {
             font-size: smaller;
             background-color: #333333e1;
             padding: 8px 5px;
@@ -186,6 +191,9 @@
                     <div class="upcomingInfo">
                         Browser Extension<br>Coming Soon!
                     </div>
+                    <div class="iosUpcomingInfo">
+                        Currently Unavailable for IOS
+                    </div>
                 </div>
             </div>
 
@@ -213,6 +221,7 @@
     <script>
         const downloadButton = document.querySelector('.download-button');
         const upcomingInfo = document.querySelector('.upcomingInfo');
+        const iosUpcomingInfo = document.querySelector('.iosUpcomingInfo');
         const userAgent = navigator.userAgent;
         let downloadUrl = 'https://github.com/mathew2103/WiFix/releases/download/v1.1.0/Wifix.v1.1.apk';
 
@@ -222,7 +231,20 @@
                 downloadUrl = data.assets[0].browser_download_url;
             })
             .catch(error => console.error('Error fetching latest release:', error));
-        if (!(userAgent.match(/iPhone/i) || userAgent.match(/Android/i))) {
+        if(userAgent.match(/iPhone/i)) {
+            downloadButton.style.cursor = 'not-allowed';
+            downloadButton.addEventListener('mouseover', () => {
+                iosUpcomingInfo.style.display = 'block';
+            });
+            downloadButton.addEventListener('mouseout', () => {
+                iosUpcomingInfo.style.display = 'none';
+            });
+        } else if(userAgent.match(/Android/i)) {
+            
+            downloadButton.addEventListener('click', (e) => {
+                window.location.href = downloadUrl;
+            });
+        } else {
             downloadButton.style.cursor = 'not-allowed';
             downloadButton.addEventListener('mouseover', () => {
                 upcomingInfo.style.display = 'block';
@@ -230,16 +252,10 @@
             downloadButton.addEventListener('mouseout', () => {
                 upcomingInfo.style.display = 'none';
             });
-        } else {
-            downloadButton.addEventListener('click', (e) => {
-                window.location.href = downloadUrl;
-            });
         }
 
 
-        let texts = ["Simple UI", "Auto Login", "Seamless Updates", "Low Battery Consumption"];
-        // if(screen.width < 768) texts = texts.filter(a => a.length < 12);
-        // sec1.style["pointer-events"] = none;
+        let texts = ["Simple UI", "Auto Login", "Seamless Updates", "Low Battery Consumption", "Open Source"];
         var typed = new Typed(".autotype", {
             strings: texts,
             typeSpeed: 145,
