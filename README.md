@@ -2,6 +2,8 @@
 
 WiFix is a simple app that automatically logs you into the IIIT Kottayam WiFi network, eliminating the hassle of manual logins. Built with React Native and Expo, WiFix seamlessly runs in the background to ensure uninterrupted connectivity.
 
+> ℹ Credentials are stored locally.
+
 ## Features
 
 - **Automatic WiFi Login**: No more typing in credentials every time you connect to the IIIT Kottayam WiFi.
