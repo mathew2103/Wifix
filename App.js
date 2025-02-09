@@ -86,7 +86,7 @@ export default function App() {
       const magic = fetched.data.match(/magic" value="([a-zA-Z0-9]+)"/i)[1];
 
       await logToStorage("POSTING login");
-      const r2 = await axios.post("http://172.16.222.1:1000/", `magic=${magic}&username=${encodeURI(loginUser)}&password=${encodeURI(loginPass)}`).catch(async e => {
+      const r2 = await axios.post("http://172.16.222.1:1000/", `magic=${magic}&username=${encodeURIComponent(loginUser)}&password=${encodeURIComponent(loginPass)}`).catch(async e => {
         console.log(e);
         await logToStorage(`ERR Posting: ${e?.message}`);  
         return null;
